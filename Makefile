@@ -5,14 +5,14 @@ CFLAGS = -std=c++17 $(XTENSOR_FLAGS)
 
 .PHONY: run clean
 
-run: ./build/test
+run: ./build/test.exe
 	$<
 
-./build/test: tests/tensorTest.cpp ./build/tensor.o
-	g++ $(CFLAGS) $< $(word 2,$^) -o $@
+./build/test.exe: tests/tensorTest.cpp ./build/tensor.o
+	g++ $(CFLAGS) $^ -o $@
 
 ./build/tensor.o: src/tensor/tensor.cpp src/tensor/tensor.h
-	g++ -c $(CFLAGS) $< -o $@
+	g++ $(CFLAGS) -c $< -o $@
 
 clean:
 	rm ./build/*
