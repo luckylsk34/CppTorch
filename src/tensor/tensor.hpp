@@ -2,6 +2,11 @@
 #define _TENSOR_H_
 
 #include <xtensor/xarray.hpp>
+#include <xtensor/xfixed.hpp>
+#include <xtensor/xio.hpp>
+#include <xtensor/xtensor.hpp>
+#include <xtensor/xview.hpp>
+
 using namespace xt;
 
 template <class T,

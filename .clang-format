@@ -10,6 +10,7 @@ IndentCaseLabels: false
 ColumnLimit: 0
 
 AlignAfterOpenBracket: Align
+AlignConsecutiveBitFields: true
 AlignEscapedNewlines: Left
 AlignOperands: Align
 BreakBeforeBinaryOperators: NonAssignment
