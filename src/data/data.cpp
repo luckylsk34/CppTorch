@@ -4,14 +4,6 @@
 #include <string>
 #include <vector>
 
-//! Byte swap unsigned int
-inline uint32_t swap_uint32(uint32_t val)
-{
-	val = ((val << 8) & 0xFF00FF00) | ((val >> 8) & 0xFF00FF);
-	return (val << 16) | (val >> 16);
-}
-
-//! Byte swap int
 inline int32_t swap_int32(int32_t val)
 {
 	val = ((val << 8) & 0xFF00FF00) | ((val >> 8) & 0xFF00FF);
@@ -23,19 +15,6 @@ inline void read(T &n, std::ifstream &file)
 {
 	file.read((char *) &n, sizeof(T));
 	n = swap_int32(n);
-}
-
-template <typename T>
-inline void read_byte(T &n, std::ifstream &file)
-{
-	file.read((char *) &n, 1);
-}
-
-auto compute(uint8_t *&data, int size)
-{
-	std::vector<int> shape = { size };
-	// return xt::adapt(data, size, xt::acquire_ownership(), shape);
-	return xt::adapt(data, size, xt::acquire_ownership(), shape);
 }
 
 MNISTDataset::MNISTDataset(std::string images_filename, std::string labels_filename)
@@ -54,14 +33,10 @@ MNISTDataset::MNISTDataset(std::string images_filename, std::string labels_filen
 	read(num_images, images_file);
 	read(num_labels, labels_file);
 	assert(num_images == num_labels);
-	// num_images = 10;
 
 	int width, height;
 	read(height, images_file);
 	read(width, images_file);
-
-	images = xt::xarray<uint8_t>::from_shape(std::vector<int>({ num_images, height, width }));
-	labels = xt::xarray<uint8_t>::from_shape(std::vector<int>({ num_images, 1 }));
 
 	int size = num_images * height * width;
 	std::vector<uint8_t> q = std::vector<uint8_t>(size);
@@ -80,10 +55,5 @@ MNISTDataset::MNISTDataset(std::string images_filename, std::string labels_filen
 	images_file.close();
 	labels_file.close();
 }
-int MNISTDataset::size()
-{
-	return 10;
-}
 
-// TrainingPair<double> operator[]() {
-// };
+int MNISTDataset::size() { return images.shape(0); }
