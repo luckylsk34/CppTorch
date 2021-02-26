@@ -13,8 +13,8 @@ template <typename T>
 class Dataset
 {
 public:
-	virtual int size() { return 0; };
-	virtual TrainingPair<T> operator[](int index) { return make_tuple(Tensor<T>(), Tensor<T>()); };
+	virtual int size() = 0;
+	virtual TrainingPair<T> operator[](int index) = 0;
 };
 
 template <typename T>
