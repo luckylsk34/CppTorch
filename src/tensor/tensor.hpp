@@ -5,6 +5,9 @@
 #include <xtensor/xio.hpp>
 #include <xtensor/xtensor.hpp>
 #include <xtensor/xview.hpp>
+#include <xtensor/xrandom.hpp>
+#include <xtensor-blas/xblas.hpp>
+#include <xtensor-blas/xlinalg.hpp>
 using namespace xt;
 
 template <class T,

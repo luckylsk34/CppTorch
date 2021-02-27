@@ -1,4 +1,4 @@
-#include "../src/loss/loss.hpp"
+#include "../src/layers/layers.hpp"
 
 using namespace xt;
 
@@ -12,11 +12,9 @@ int main(int argc, char *argv[])
 	// std::cout << xt::pow(arr1, 2)<< std::endl;
 	Tensor<double> pred{5.0, 6.0, 7.0};
 	Tensor<double> act{1.0, 6.0, 7.0};
-	MSE mse_loss = MSE();
-	std::cout << mse_loss(pred,act) << std::endl;
-	std::cout <<  xt::transpose(arr1) << std::endl;
-	std::cout << xt::linalg::dot(arr1, arr1) +  arr2<< std::endl;
-	std::cout << xt::random::randn<double>({3, 3}) << std::endl;
+    Linear <double> linear(3,4);
+
+    std::cout << linear.forward(arr1) << std::endl;
 
 	return 0;
 }
