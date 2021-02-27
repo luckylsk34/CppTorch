@@ -5,11 +5,14 @@ IndentWidth: 4
 TabWidth: 4
 AccessModifierOffset: -4
 
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+
 BreakBeforeBraces: Linux
 IndentCaseLabels: false
 ColumnLimit: 0
 
 AlignAfterOpenBracket: Align
+AlignConsecutiveBitFields: true
 AlignEscapedNewlines: Left
 AlignOperands: Align
 BreakBeforeBinaryOperators: NonAssignment
@@ -19,7 +22,7 @@ AllowShortBlocksOnASingleLine: true
 AllowShortLoopsOnASingleLine: true
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortEnumsOnASingleLine: true
-AllowShortFunctionsOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: All
 AllowShortIfStatementsOnASingleLine: WithoutElse
 AllowShortLambdasOnASingleLine: Inline
 

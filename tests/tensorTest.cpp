@@ -1,4 +1,4 @@
-#include "../src/CppTorch.h"
+#include "../src/CppTorch.hpp"
 
 using namespace xt;
 
