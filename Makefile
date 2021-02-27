@@ -6,8 +6,11 @@ CFLAGS = -std=c++17 $(XTENSOR_FLAGS) -DXTENSOR_USE_FLENS_BLAS
 
 .PHONY: run clean
 
-run: ./build/layertest.exe
+run: ./build/neuralnetTest.exe
 	$<
+
+./build/neuralnetTest.exe: tests/neuralnetTest.cpp ./build/layers.o 
+	$(CC) $(CFLAGS) $^ -o $@
 
 ./build/layertest.exe: tests/layerTest.cpp ./build/layers.o 
 	$(CC) $(CFLAGS) $^ -o $@
@@ -18,7 +21,7 @@ run: ./build/layertest.exe
 ./build/losstest.exe: tests/lossTest.cpp ./build/loss.o 
 	$(CC) $(CFLAGS) $^ -o $@
 
-./build/layers.o: src/layers/layers.cpp src/layers/layers.hpp
+./build/layers.o: src/layers/layers.cpp src/layers/layers.hpp src/layers/nn.hpp
 	$(CC) $(CFLAGS) -c $< -o $@
 
 ./build/loss.o: src/loss/loss.cpp src/loss/loss.hpp
