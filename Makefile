@@ -6,8 +6,11 @@ CFLAGS = -std=c++17 $(XTENSOR_FLAGS) -DXTENSOR_USE_FLENS_BLAS
 
 .PHONY: run clean
 
-run: ./build/trainTest.exe
+run: ./build/MNISTTest.exe
 	$<
+
+./build/MNISTTest.exe: tests/MNISTTest.cpp ./build/layers.o ./build/data.o
+	$(CC) $(CFLAGS) $^ -o $@
 
 ./build/trainTest.exe: tests/trainTest.cpp ./build/layers.o 
 	$(CC) $(CFLAGS) $^ -o $@

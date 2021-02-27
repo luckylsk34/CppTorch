@@ -8,8 +8,10 @@
 #include <xtensor/xio.hpp>
 #include <xtensor/xmath.hpp>
 #include <xtensor/xrandom.hpp>
+#include <xtensor/xsort.hpp>
 #include <xtensor/xtensor.hpp>
 #include <xtensor/xview.hpp>
+
 
 using namespace xt;
 
