@@ -49,8 +49,12 @@ MNISTDataset::MNISTDataset(std::string images_filename, std::string labels_filen
 	labels_file.read((char *) q.data(), size);
 	shape = { num_images, 1 };
 	labels = xt::adapt(q, shape);
+	labels = Tensor<uint8_t>::from_shape({ (unsigned long long) num_images, 10 });
+	for (int i = 0; i < num_images; ++i) {
+		xt::view(labels, i, q[i] - 1, xt::all()) = 1;
+	}
 
-	std::cout << xt::sum(labels) << std::endl;
+	// std::cout << xt::sum(labels) << std::endl;
 
 	images_file.close();
 	labels_file.close();
