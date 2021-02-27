@@ -6,6 +6,8 @@
 #include <xtensor/xtensor.hpp>
 #include <xtensor/xview.hpp>
 #include <xtensor/xrandom.hpp>
+#include <xtensor/xadapt.hpp>
+#include <xtensor/xmath.hpp>
 #include <xtensor-blas/xblas.hpp>
 #include <xtensor-blas/xlinalg.hpp>
 using namespace xt;
