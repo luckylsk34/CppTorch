@@ -30,8 +30,8 @@ public:
 	Tensor<T> inputs;
 	Linear(int input_size, int output_size)
 	{
-		this->params["w"] = xt::eval(xt::random::randn<T>({input_size, output_size}));
-		this->params["b"] = xt::eval(xt::random::randn<T>({output_size}));
+		this->params["w"] = xt::eval(xt::random::randn<T>({ input_size, output_size }));
+		this->params["b"] = xt::eval(xt::random::randn<T>({ output_size }));
 	}
 
 	Tensor<T> forward(Tensor<T> input) override
@@ -61,13 +61,15 @@ template <typename T>
 class Activation : public Layer<T>
 {
 public:
+	bool alt_backward;
 	Tensor<T> inputs;
 	std::function<Tensor<T>(Tensor<T>)> f;
 	std::function<Tensor<T>(Tensor<T>)> f_prime;
 	Activation(std::function<Tensor<T>(Tensor<T>)> f,
-			   std::function<Tensor<T>(Tensor<T>)> f_prime)
-		: f(f),
-		  f_prime(f_prime)
+	           std::function<Tensor<T>(Tensor<T>)> f_prime, bool alt_backward = false)
+		: f(f)
+		, f_prime(f_prime)
+		, alt_backward(alt_backward)
 	{
 	}
 
@@ -79,29 +81,87 @@ public:
 
 	Tensor<T> backward(Tensor<T> grad) override
 	{
-		return this->f_prime(this->inputs) * grad;
+		if (!alt_backward)
+			return this->f_prime(this->inputs) * grad;
+
+		auto f_grad = this->f_prime(this->inputs);
+		auto res = Tensor<T>::from_shape(grad.shape());
+		for (int batch = 0; batch < f_grad.shape(0); batch++)
+			xt::view(res, batch, xt::all()) =
+				xt::linalg::dot(xt::view(f_grad, batch, xt::all()),
+			                    xt::view(grad, batch, xt::all()));
+		return res;
 	}
-
 };
-
-template <typename T>
-Tensor<T> tanh(Tensor<T> input)
-{
-	return xt::tanh(input);
-}
-
-template <typename T>
-Tensor<T> tanh_prime(Tensor<T> input)
-{
-	input = xt::tanh(input);
-	return 1 - xt::pow(input, 2);
-}
 
 template <typename T>
 class Tanh : public Activation<T>
 {
+	static Tensor<T> tanh(Tensor<T> input)
+	{
+		return xt::tanh(input);
+	}
+
+	static Tensor<T> tanh_prime(Tensor<T> input)
+	{
+		input = xt::tanh(input);
+		return 1 - xt::pow(input, 2);
+	}
+
 public:
-	Tanh() : Activation<T>(tanh<T>, tanh_prime<T>)
+	Tanh()
+		: Activation<T>(tanh, tanh_prime)
+	{
+	}
+};
+
+template <typename T>
+class Sigmoid : public Activation<T>
+{
+	static Tensor<T> sigmoid(Tensor<T> input)
+	{
+		return 1 / (1 + xt::exp(-input));
+	}
+
+	static Tensor<T> sigmoid_prime(Tensor<T> input)
+	{
+		auto x = sigmoid(input);
+		return x * (1 - x);
+	}
+
+public:
+	Sigmoid()
+		: Activation<T>(sigmoid, sigmoid_prime)
+	{
+	}
+};
+
+template <typename T>
+class Softmax : public Activation<T>
+{
+	static Tensor<T> softmax(Tensor<T> input)
+	{
+		auto m = xt::amax(input);
+		auto x = xt::exp(input - m);
+		return xt::transpose(xt::transpose(x) / xt::transpose(xt::sum(x, 1)));
+	}
+
+	static Tensor<T> softmax_prime(Tensor<T> input)
+	{
+		auto sm = softmax(input);
+		auto eyes = Tensor<T>::from_shape({input.shape(0), input.shape(1), input.shape(1)});
+		for (int batch = 0; batch < input.shape(0); ++batch) {
+			auto eye = xt::view(eyes, batch, xt::all());
+			auto s = xt::view(sm, batch, xt::all());
+			auto oms = xt::eye(input.shape(1)) - s;
+			eye = xt::transpose(s * xt::transpose(oms));
+		}
+		return eyes;
+	}
+
+public:
+	Softmax()
+		: Activation<T>(softmax, softmax_prime, true)
 	{
 	}
 };
