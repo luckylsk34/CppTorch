@@ -17,7 +17,7 @@ public:
 	virtual Tensor<T> forward(Tensor<T> input) = 0;
 	virtual Tensor<T> backward(Tensor<T> grad) = 0;
 
-	inline auto operator()(Tensor<T> input)
+	auto operator()(Tensor<T> input)
 	{
 		return forward(input);
 	}
@@ -30,8 +30,8 @@ public:
 	Tensor<T> inputs;
 	Linear(int input_size, int output_size)
 	{
-		this->params["w"] = xt::eval(xt::random::randn<T>({ input_size, output_size }));
-		this->params["b"] = xt::eval(xt::random::randn<T>({ output_size }));
+		this->params["w"] = xt::eval(xt::random::randn<T>({input_size, output_size}));
+		this->params["b"] = xt::eval(xt::random::randn<T>({output_size}));
 	}
 
 	Tensor<T> forward(Tensor<T> input) override
@@ -58,8 +58,52 @@ public:
 };
 
 template <typename T>
-class Activation : Layer<T>
+class Activation : public Layer<T>
 {
+public:
+	Tensor<T> inputs;
+	std::function<Tensor<T>(Tensor<T>)> f;
+	std::function<Tensor<T>(Tensor<T>)> f_prime;
+	Activation(std::function<Tensor<T>(Tensor<T>)> f,
+			   std::function<Tensor<T>(Tensor<T>)> f_prime)
+		: f(f),
+		  f_prime(f_prime)
+	{
+	}
+
+	Tensor<T> forward(Tensor<T> input) override
+	{
+		this->inputs = input;
+		return this->f(input);
+	}
+
+	Tensor<T> backward(Tensor<T> grad) override
+	{
+		return this->f_prime(this->inputs) * grad;
+	}
+
+};
+
+template <typename T>
+Tensor<T> tanh(Tensor<T> input)
+{
+	return xt::tanh(input);
+}
+
+template <typename T>
+Tensor<T> tanh_prime(Tensor<T> input)
+{
+	input = xt::tanh(input);
+	return 1 - xt::pow(input, 2);
+}
+
+template <typename T>
+class Tanh : public Activation<T>
+{
+public:
+	Tanh() : Activation<T>(tanh<T>, tanh_prime<T>)
+	{
+	}
 };
 
 #endif

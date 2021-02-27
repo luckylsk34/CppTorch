@@ -2,38 +2,51 @@
 #define _Loss_H_
 
 #include "../tensor/tensor.hpp"
+#include "../layers/nn.hpp"
 
 template <typename T>
 class Loss
 {
 public:
+	NeuralNet<T> *nn;
+	Loss(NeuralNet<T> &nn)
+		: nn(&nn) {};
 	/*loss function*/
-	virtual Tensor<T> loss(Tensor<T> predicted, Tensor<T> actual) = 0;
+	virtual Tensor<T> loss() = 0;
 	/*gradiant of the loss function*/
 	virtual Tensor<T> grad(Tensor<T> predicted, Tensor<T> actual) = 0;
 };
 
-typedef double MSE_Dtype;
-class MSE : Loss<MSE_Dtype>
+template<typename T>
+class MSE : public Loss<T>
 {
 public:
-	MSE() {};
-
-	Tensor<MSE_Dtype> loss(Tensor<MSE_Dtype> predicted, Tensor<MSE_Dtype> actual)
+	MSE(NeuralNet<T> &nn): Loss<T>(nn) {};
+	Tensor<T> predicted, actual;
+	Tensor<T> loss() override
 	{
-		auto res = xt::pow(predicted - actual, 2);
+		auto res = xt::pow(this->predicted - this->actual, 2);
 		return xt::sum(res);
 	}
 
-	Tensor<MSE_Dtype> grad(Tensor<MSE_Dtype> predicted, Tensor<MSE_Dtype> actual)
+	Tensor<T> grad(Tensor<T> predicted, Tensor<T> actual) override
 	{
 		auto res = predicted - actual;
 		return res * 2;
 	}
-
-	auto operator()(Tensor<MSE_Dtype> predicted, Tensor<MSE_Dtype> actual)
+	auto backward()
 	{
-		return loss(predicted, actual);
+		auto res = grad(this->predicted, this->actual);
+		this->predicted = Tensor<T>();
+		this->actual = Tensor<T>();
+		return this->nn->backward(res);
+
+	}
+	auto operator()(Tensor<T> predicted, Tensor<T> actual)
+	{
+		this->predicted = predicted;
+		this->actual = actual;
+		return *this;
 	}
 };
 

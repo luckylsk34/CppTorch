@@ -16,5 +16,11 @@ int main(int argc, char *argv[])
 		                  { 2.0, 5.0, 7.0, 4.0 } };
 	std::cout << linear.backward(grad) << std::endl;
 
+	Tanh<double> tanh;
+	std::cout << tanh(arr2)<<std::endl;
+	std::cout << xt::tanh(arr2) << std::endl;
+	std::cout << tanh.backward(arr2)<<std::endl;
+
+
 	return 0;
 }
