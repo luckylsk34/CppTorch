@@ -17,9 +17,20 @@ typedef double MSE_Dtype;
 class MSE : Loss<MSE_Dtype>
 {
 public:
-	MSE(){};
-	Tensor<MSE_Dtype> loss(Tensor<MSE_Dtype> predicted, Tensor<MSE_Dtype> actual);
-	Tensor<MSE_Dtype> grad(Tensor<MSE_Dtype> predicted, Tensor<MSE_Dtype> actual);
+	MSE() {};
+
+	Tensor<MSE_Dtype> loss(Tensor<MSE_Dtype> predicted, Tensor<MSE_Dtype> actual)
+	{
+		auto res = xt::pow(predicted - actual, 2);
+		return xt::sum(res);
+	}
+
+	Tensor<MSE_Dtype> grad(Tensor<MSE_Dtype> predicted, Tensor<MSE_Dtype> actual)
+	{
+		auto res = predicted - actual;
+		return res * 2;
+	}
+
 	auto operator()(Tensor<MSE_Dtype> predicted, Tensor<MSE_Dtype> actual)
 	{
 		return loss(predicted, actual);
