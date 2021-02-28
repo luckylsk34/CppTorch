@@ -30,8 +30,8 @@ public:
 	Tensor<T> inputs;
 	Linear(int input_size, int output_size)
 	{
-		this->params["w"] = xt::eval(xt::random::randn<T>({ input_size, output_size }));
-		this->params["b"] = xt::eval(xt::random::randn<T>({ output_size }));
+		this->params["w"] = xt::eval(xt::random::randn<T>({input_size, output_size}));
+		this->params["b"] = xt::eval(xt::random::randn<T>({output_size}));
 	}
 
 	Tensor<T> forward(Tensor<T> input) override
@@ -66,10 +66,8 @@ public:
 	std::function<Tensor<T>(Tensor<T>)> f;
 	std::function<Tensor<T>(Tensor<T>)> f_prime;
 	Activation(std::function<Tensor<T>(Tensor<T>)> f,
-	           std::function<Tensor<T>(Tensor<T>)> f_prime, bool alt_backward = false)
-		: f(f)
-		, f_prime(f_prime)
-		, alt_backward(alt_backward)
+			   std::function<Tensor<T>(Tensor<T>)> f_prime, bool alt_backward = false)
+		: f(f), f_prime(f_prime), alt_backward(alt_backward)
 	{
 	}
 
@@ -89,7 +87,7 @@ public:
 		for (int batch = 0; batch < f_grad.shape(0); batch++)
 			xt::view(res, batch, xt::all()) =
 				xt::linalg::dot(xt::view(f_grad, batch, xt::all()),
-			                    xt::view(grad, batch, xt::all()));
+								xt::view(grad, batch, xt::all()));
 		return res;
 	}
 };
@@ -139,6 +137,7 @@ public:
 template <typename T>
 class Softmax : public Activation<T>
 {
+public:
 	static Tensor<T> softmax(Tensor<T> input)
 	{
 		auto m = xt::amax(input);
@@ -150,7 +149,8 @@ class Softmax : public Activation<T>
 	{
 		auto sm = softmax(input);
 		auto eyes = Tensor<T>::from_shape({input.shape(0), input.shape(1), input.shape(1)});
-		for (int batch = 0; batch < input.shape(0); ++batch) {
+		for (int batch = 0; batch < input.shape(0); ++batch)
+		{
 			auto eye = xt::view(eyes, batch, xt::all());
 			auto s = xt::view(sm, batch, xt::all());
 			auto oms = xt::eye(input.shape(1)) - s;
@@ -159,7 +159,6 @@ class Softmax : public Activation<T>
 		return eyes;
 	}
 
-public:
 	Softmax()
 		: Activation<T>(softmax, softmax_prime, true)
 	{

@@ -24,7 +24,7 @@ public:
 	Dataset<T> *dataset;
 	int batch_size;
 
-	DataLoader(Dataset<T> &dataset, int batch_size = 1)
+	explicit DataLoader(Dataset<T> &dataset, int batch_size = 1)
 		: dataset(&dataset), batch_size(batch_size) {};
 
 	template <typename S>

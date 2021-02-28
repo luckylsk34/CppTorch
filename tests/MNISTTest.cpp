@@ -6,10 +6,10 @@ public:
 	MNISTClassifier()
 	{
 		auto input_size = 28 * 28;
-		add(new Linear<double>(input_size, input_size));
-		add(new Linear<double>(input_size, input_size));
+		add(new Linear<double>(input_size, 256));
+		add(new Linear<double>(256, 128));
 		add(new Tanh<double>());
-		add(new Linear<double>(input_size, 10));
+		add(new Linear<double>(128, 10));
 		add(new Softmax<double>());
 	}
 };
@@ -19,10 +19,10 @@ int main(int argc, char **argv)
 	std::string images_file = "datasets\\mnist\\train-images.idx3-ubyte";
 	std::string labels_file = "datasets\\mnist\\train-labels.idx1-ubyte";
 	MNISTDataset mnistDataset(images_file, labels_file);
-	DataLoader dataLoader(mnistDataset, 16);
+	DataLoader dataLoader(mnistDataset, 128);
 
 	MNISTClassifier nn;
-	SGD sgd(nn, 0.0001);
+	SGD sgd(nn, 0.001);
 	MSE mse_loss(nn);
 
 	xt::print_options::set_line_width(180);
@@ -31,13 +31,8 @@ int main(int argc, char **argv)
 	while (n--) {
 		for (auto batch : dataLoader) {
 			auto [input, target] = batch;
-			input.reshape({16, -1});
-			// std::cout << xt::adapt(input.shape()) << std::endl;
-			// std::cout << xt::adapt(target.shape()) << std::endl;
-			// std::cout << target << std::endl;
+			input.reshape({ 128, -1 });
 			auto pred = nn(input);
-			// std::cout << xt::argmax(target, 1) << std::endl;
-			// std::cout << xt::argmax(pred, 1) << std::endl;
 			auto loss = mse_loss(pred, target);
 			std::cout << "Epoch :" << epochs - n << " loss: " << loss.loss() << std::endl;
 			loss.backward();

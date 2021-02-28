@@ -10,6 +10,7 @@ public:
         add(new Linear<double>(2, 2));
         add(new Tanh<double>());
         add(new Linear<double>(2, 2));
+        add(new Softmax<double>());
     }
 };
 
@@ -24,7 +25,7 @@ int main()
     auto target = xt::eval(Tensor<double>{{1, 0}, {0, 1}, {0, 1}, {1, 0}});
     // auto grad = xt::eval(xt::random::randn<double>({ 2, 6 }));
     std::cout << input << std::endl;
-    int epochs = 1000;
+    int epochs = 5000;
     int n = epochs;
     while (n--)
     {
