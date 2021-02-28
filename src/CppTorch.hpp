@@ -1,2 +1,5 @@
+#include "loss/loss.hpp"
+#include "optim/optim.hpp"
+#include "layers/layers.hpp"
 #include "data/data.hpp"
 #include "tensor/tensor.hpp"
